@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "319978634231",
+    "project_id": "massage-appointment-book-d5ff1",
+    "storage_bucket": "massage-appointment-book-d5ff1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319978634231:android:ce54f658f3462733048cf2",
+        "android_client_info": {
+          "package_name": "com.brittani.massageapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5wRRv9N0a1JW1kzn2IxpNdnoXhLeg8zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
