@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, Text, StyleSheet } from "react-native";
-import { account } from "../services/appwrite";
+import { account } from "../../services/appwrite";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
