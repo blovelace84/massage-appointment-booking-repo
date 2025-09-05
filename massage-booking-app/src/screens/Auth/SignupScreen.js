@@ -1,31 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { account } from '../../services/appwrite';
+import React, { useState } from "react";
+import { View, TextInput, Button, Text, StyleSheet } from "react-native";
+import { account } from "../../services/appwrite";
 
 export default function SignupScreen({ navigation }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSignup = async () => {
     try {
-      await account.create('unique()', email, password, name);
-      navigation.navigate('Login');
+      await account.create("unique()", email, password);
+      // After signup, log in automatically
+      await account.createEmailPasswordSession(email, password);
+      navigation.replace("Home"); // navigate to Home screen after signup
     } catch (err) {
-      setError('Signup failed');
+      setError(err.message);
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Signup</Text>
-      <TextInput
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <TextInput
         placeholder="Email"
         value={email}
@@ -39,19 +35,18 @@ export default function SignupScreen({ navigation }) {
         secureTextEntry
         style={styles.input}
       />
-      <Button title="Sign Up" onPress={handleSignup} />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button
-        title="Already have an account? Login"
-        onPress={() => navigation.navigate('Login')}
-      />
+      <Button title="Signup" onPress={handleSignup} />
+      <Text onPress={() => navigation.navigate("Login")} style={styles.link}>
+        Already have an account? Login
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: 'center' },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  error: { color: 'red', marginTop: 10 },
+  container: { flex: 1, justifyContent: "center", padding: 20 },
+  input: { borderWidth: 1, marginBottom: 12, padding: 10, borderRadius: 5 },
+  error: { color: "red", marginBottom: 10 },
+  title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
+  link: { color: "blue", marginTop: 15, textAlign: "center" },
 });

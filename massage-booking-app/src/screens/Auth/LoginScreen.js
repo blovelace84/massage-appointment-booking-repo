@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { account } from '../../services/appwrite';
+import React, { useState } from "react";
+import { View, TextInput, Button, Text, StyleSheet } from "react-native";
+import { account } from "../services/appwrite";
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     try {
-      await account.createEmailSession(email, password);
-      // TODO: Navigate to Home after login
-      console.log('Login successful');
+      await account.createEmailPasswordSession(email, password);
+      navigation.replace("Home"); // navigate to Home after login
     } catch (err) {
-      setError('Invalid credentials');
+      setError("Invalid email or password");
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <TextInput
         placeholder="Email"
         value={email}
@@ -34,18 +34,17 @@ export default function LoginScreen({ navigation }) {
         style={styles.input}
       />
       <Button title="Login" onPress={handleLogin} />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button
-        title="Don't have an account? Sign up"
-        onPress={() => navigation.navigate('Signup')}
-      />
+      <Text onPress={() => navigation.navigate("Signup")} style={styles.link}>
+        Don’t have an account? Signup
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: 'center' },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  error: { color: 'red', marginTop: 10 },
+  container: { flex: 1, justifyContent: "center", padding: 20 },
+  input: { borderWidth: 1, marginBottom: 12, padding: 10, borderRadius: 5 },
+  error: { color: "red", marginBottom: 10 },
+  title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
+  link: { color: "blue", marginTop: 15, textAlign: "center" },
 });
