@@ -1,35 +1,44 @@
-import * as React from "react";
-import { Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { account } from "./src/services/appwrite";
 
-import SignupScreen from "./src/screens/Auth/SignupScreen";
+// Screens
+import HomeScreen from "./src/screens/HomeScreen";
 import LoginScreen from "./src/screens/Auth/LoginScreen";
+import SignupScreen from "./src/screens/Auth/SignupScreen";
 
 const Stack = createNativeStackNavigator();
 
-function HomeScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Home Screen</Text>
-    </View>
-  );
-}
-
-function DetailsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Details Screen</Text>
-    </View>
-  );
-}
-
 export default function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const getUser = async () => {
+      try {
+        const currentUser = await account.get();
+        setUser(currentUser);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+    getUser();
+  }, []);
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          // If logged in, show home
+          <Stack.Screen name="Home" component={HomeScreen} />
+        ) : (
+          // If not logged in, show login/signup
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
