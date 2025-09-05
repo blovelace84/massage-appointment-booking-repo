@@ -9,7 +9,7 @@ import SignupScreen from "../screens/Auth/SignupScreen";
 import HomeScreen from "../screens/HomeScreen";
 import BookingScreen from "../screens/BookingScreen";
 import AppointmentScreen from "../screens/AppointmentScreen";
-import ProfileScreen from "../screens/ProfileScreen";
+import ProfileScreen from "../screens/ProfileScreen.tsx";
 
 export type RootStackParamList = {
   Login: undefined;
