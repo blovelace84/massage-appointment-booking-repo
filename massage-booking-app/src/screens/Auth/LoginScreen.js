@@ -10,7 +10,7 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = async () => {
     try {
       await account.createEmailPasswordSession(email, password);
-      navigation.replace("Home"); // navigate to Home after login
+      // navigation.replace("Home"); // navigate to Home after login
     } catch (err) {
       setError("Invalid email or password");
     }
