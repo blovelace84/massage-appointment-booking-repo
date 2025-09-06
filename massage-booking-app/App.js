@@ -7,6 +7,7 @@ import { account } from "./src/services/appwrite";
 import HomeScreen from "./src/screens/HomeScreen";
 import LoginScreen from "./src/screens/Auth/LoginScreen";
 import SignupScreen from "./src/screens/Auth/SignupScreen";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const Stack = createNativeStackNavigator();
 
@@ -14,12 +15,15 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Check if user is logged in
     const getUser = async () => {
-      try {
+      try{
         const currentUser = await account.get();
         setUser(currentUser);
-      } catch (error) {
+      }catch(error) {
+        //Only log unexpected errors, ignore scope errors
+        if(error.code !== 401) {
+          console.warn("Appwrite error:", error);
+        }
         setUser(null);
       }
     };
