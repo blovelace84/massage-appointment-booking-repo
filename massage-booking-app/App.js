@@ -15,19 +15,20 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const getUser = async () => {
-      try{
+    const checkUser = async () => {
+      try {
         const currentUser = await account.get();
         setUser(currentUser);
-      }catch(error) {
-        //Only log unexpected errors, ignore scope errors
+      } catch(error) {
+        // No user logged in
         if(error.code !== 401) {
-          console.warn("Appwrite error:", error);
+          setUser(null); //guest treated as logged out
+        } else{
+          console.warn("Unexpected Appwrite error:", error);
+          setUser(null);
         }
-        setUser(null);
       }
     };
-    getUser();
   }, []);
 
   return (

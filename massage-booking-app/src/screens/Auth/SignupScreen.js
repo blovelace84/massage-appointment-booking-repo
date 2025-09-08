@@ -9,12 +9,19 @@ export default function SignupScreen({ navigation }) {
 
   const handleSignup = async () => {
     try {
-      await account.create("unique()", email, password);
-      // After signup, log in automatically
+      await account.create(ID.unique(), email, password, name);
+      // Immediately log in the user after successful signup
       await account.createEmailPasswordSession(email, password);
-      navigation.replace("Home"); // navigate to Home screen after signup
+
+      //Fetch current user details
+      const currentUser = await account.get();
+      setUser(currentUser);
     } catch (err) {
-      setError(err.message);
+      if(err.code === 409){
+        setError("User already exists");
+      }else{
+        setError(err.message);
+      }
     }
   };
 
