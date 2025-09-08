@@ -9,10 +9,14 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     try {
+      //try to create a session
       await account.createEmailPasswordSession(email, password);
-      // navigation.replace("Home"); // navigate to Home after login
+      // Fetch user info
+      const currentUser = await account.get();
+      setUser(currentUser);
     } catch (err) {
       setError("Invalid email or password");
+      console.error("Login error:", err);
     }
   };
 
