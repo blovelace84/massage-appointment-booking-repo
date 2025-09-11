@@ -1,15 +1,18 @@
-import { Text, View } from "react-native";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import SignupScreen from "./screens/SignupScreen";
+import LoginScreen from "./screens/LoginScreen";
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>This is my new app!</Text>
-    </View>
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return(
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
