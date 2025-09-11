@@ -1,23 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { account } from "../services/appwrite";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-type RootStackParamList = {
-  Login: undefined;
-  Signup: undefined;
-  ClientHome: undefined;
-  TherapistDashboard: undefined;
-};
-
-type LoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Login"
->;
+import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,16 +12,16 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       // Create a session
-      await account.createSession(email, password);
+      await account.createEmailSession(email, password);
 
-      // ✅ Here we should fetch user details (role: client or therapist)
+      // Get user info
       const user = await account.get();
 
-      // Example: check if user name contains "Therapist"
+      // TEMP role check
       if (user.name.toLowerCase().includes("therapist")) {
-        navigation.replace("TherapistDashboard");
+        router.replace("/(therapist)/dashboard");
       } else {
-        navigation.replace("ClientHome");
+        router.replace("/(client)/home");
       }
     } catch (err: any) {
       alert("Login failed: " + err.message);
@@ -66,7 +53,7 @@ export default function LoginScreen() {
 
       <Text
         style={styles.link}
-        onPress={() => navigation.navigate("Signup")}
+        onPress={() => router.push("/screens/SignupScreen")}
       >
         Don’t have an account? Sign up
       </Text>
