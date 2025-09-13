@@ -1,11 +1,10 @@
 // src/components/Login.jsx
 import { useState } from "react";
-import { auth, db } from "../services/firebase.config";
+import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../services/firebase.config";
 
-function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -14,24 +13,17 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Get role from Firestore
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const { role } = userDoc.data();
-        navigate(role === "client" ? "/home-client" : "/home-therapist");
-      } else {
-        setError("User role not found.");
-      }
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("User logged in ✅");
+      navigate("/"); // after login, go to home (can be client/admin page later)
     } catch (err) {
+      console.error(err.message);
       setError(err.message);
     }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
@@ -40,20 +32,23 @@ function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-        /><br />
+        />
+        <br />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-        /><br />
-        <button type="submit">Login</button>
+        />
+        <br />
+        <button type="submit">Log In</button>
       </form>
-      <p>
-        Don’t have an account? <Link to="/signup">Sign up here</Link>
-      </p>
       {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <p>
+        Don’t have an account? <Link to="/signup">Sign up</Link>
+      </p>
     </div>
   );
 }
