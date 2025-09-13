@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../services/firebase.config";
 import { useNavigate } from "react-router-dom";
 
-const HomeClient = () => {
+export function HomeClient () {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -41,5 +41,3 @@ const HomeClient = () => {
         </div>
     );
 }
-
-export default HomeClient;
