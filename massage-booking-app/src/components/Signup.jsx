@@ -1,9 +1,9 @@
 // src/components/Signup.jsx
 import { useState } from "react";
-import { auth, db } from "../services/firebaseConfig";
+import { auth, db } from "../services/firebase.config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -55,6 +55,9 @@ const Signup = () => {
         </select><br />
         <button type="submit">Sign Up</button>
       </form>
+      <p>
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
