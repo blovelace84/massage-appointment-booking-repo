@@ -2,9 +2,10 @@ import { Routes, Route, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import HomeClient from "./pages/HomeClient";
+import { HomeClient } from './pages/HomeClient';
 import HomeTherapist from "./pages/HomeTherapist";
 import { auth } from "./services/firebase.config";
+
 const App = () => {
 
   useEffect(() => {
@@ -22,7 +23,6 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/client" element={<HomeClient />} />
         <Route path="/home-therapist" element={<HomeTherapist />} />
-        <Route path="/" element={<h1>Welcome to the Massage Booking App</h1>} />
         {/* fallback route */}
         <Route path="*" element={<h1>Page not found</h1>} />
         
