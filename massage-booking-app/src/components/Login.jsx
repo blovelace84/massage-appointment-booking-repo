@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/firebase.config";
 
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -15,9 +15,10 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in ✅");
-      navigate("/"); // after login, go to home (can be client/admin page later)
+
+      // 👇 redirect to client dashboard
+      navigate("/client");
     } catch (err) {
-      console.error(err.message);
       setError(err.message);
     }
   };
@@ -32,17 +33,15 @@ const Login = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-        />
-        <br />
+        /><br />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-        />
-        <br />
-        <button type="submit">Log In</button>
+        /><br />
+        <button type="submit">Login</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -52,5 +51,3 @@ const Login = () => {
     </div>
   );
 }
-
-export default Login;

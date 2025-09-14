@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Login from "./components/Login";
 import Signup from "./components/Signup";
@@ -7,7 +7,7 @@ import HomeTherapist from "./pages/HomeTherapist";
 import { auth } from "./services/firebase.config";
 
 const App = () => {
-
+  
   useEffect(() => {
     console.log("Firebase Auth Ready!", auth);
   }, []);
@@ -23,9 +23,10 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/client" element={<HomeClient />} />
         <Route path="/home-therapist" element={<HomeTherapist />} />
+        {/* redirect root to login */}
+        <Route path="/" element={<Navigate to="/login" />} />
         {/* fallback route */}
-        <Route path="*" element={<h1>Page not found</h1>} />
-        
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </div>
   );
