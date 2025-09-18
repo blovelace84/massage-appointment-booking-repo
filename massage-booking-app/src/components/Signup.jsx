@@ -2,28 +2,47 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth }  from "../services/firebase.config";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../services/firebase.config";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      //create user in firebase auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      //save role in firestore
+      await setDoc(doc(db, "users", user.id), {
+        email: user.email,
+        role: role,
+      });
       console.log("User signed up ✅");
-      navigate("/login"); // redirect after signup
+
+      //Redirect based on role
+      if (role === "client") {
+        navigate("/client");
+      } else {
+        navigate("/home-therapist");
+      }
     } catch (err) {
-      console.error(err.message);
       setError(err.message);
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Signup</h2>
       <form onSubmit={handleSignup}>
         <input
@@ -42,6 +61,19 @@ const Signup = () => {
           required
         />
         <br />
+        <label htmlFor="role">
+          Role:{" "}
+          <select
+            name="role"
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="client">Client</option>
+            <option value="therapist">Therapist</option>
+          </select>
+        </label>
+        <br />
         <button type="submit">Sign Up</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -51,6 +83,6 @@ const Signup = () => {
       </p>
     </div>
   );
-}
+};
 
 export default Signup;
