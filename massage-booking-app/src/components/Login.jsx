@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebase.config";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../services/firebase.config";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,18 +14,37 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("User logged in ✅");
+      // Sign in with Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-      // 👇 redirect to client dashboard
-      navigate("/client");
+      // Get user role from Firestore
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const { role } = userDoc.data();
+
+        console.log("Looking for user role in users/" + user.uid);
+
+        // Redirect based on role
+        if (role === "client") {
+          navigate("/client");
+        } else {
+          navigate("/home-therapist");
+        }
+      } else {
+        setError("User role not found in database.");
+      }
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
@@ -33,15 +53,17 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-        /><br />
+        />
+        <br />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-        /><br />
-        <button type="submit">Login</button>
+        />
+        <br />
+        <button type="submit">Log In</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
 

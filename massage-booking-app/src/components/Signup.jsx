@@ -8,14 +8,14 @@ import { auth, db } from "../services/firebase.config";
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("client"); // ✅ default to client
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      //create user in firebase auth
+      // Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -23,14 +23,15 @@ const Signup = () => {
       );
       const user = userCredential.user;
 
-      //save role in firestore
-      await setDoc(doc(db, "users", user.id), {
+      // Save role in Firestore using user.uid ✅
+      await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         role: role,
       });
-      console.log("User signed up ✅");
 
-      //Redirect based on role
+      console.log("User signed up ✅", role);
+
+      // Redirect based on role
       if (role === "client") {
         navigate("/client");
       } else {
