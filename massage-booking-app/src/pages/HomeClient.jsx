@@ -2,14 +2,12 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "../services/firebase.config";
 import { signOut } from "firebase/auth";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 export default function HomeClient() {
   const [therapists, setTherapists] = useState([]);
   const navigate = useNavigate();
-
-  // Get current logged-in user
   const user = auth.currentUser;
 
   // Fetch therapists from Firestore
@@ -17,7 +15,10 @@ export default function HomeClient() {
     const fetchTherapists = async () => {
       try {
         const snapshot = await getDocs(collection(db, "therapists"));
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const data = snapshot.docs.map((docSnap) => ({
+          id: docSnap.id, // therapist UID if stored properly
+          ...docSnap.data(),
+        }));
         setTherapists(data);
       } catch (err) {
         console.error("Error fetching therapists:", err);
@@ -25,6 +26,30 @@ export default function HomeClient() {
     };
     fetchTherapists();
   }, []);
+
+  // Handle booking
+  const handleBooking = async (therapist) => {
+    try {
+      if (!user) {
+        alert("You must be logged in to book an appointment");
+        return;
+      }
+
+      await addDoc(collection(db, "bookings"), {
+        clientId: user.uid,
+        clientEmail: user.email,
+        therapistId: therapist.id, // ✅ now therapist.uid from therapists collection
+        therapistName: therapist.name,
+        date: new Date().toISOString(),
+        status: "pending",
+      });
+
+      alert(`Booking request sent to ${therapist.name} ✅`);
+    } catch (err) {
+      console.error("Error booking appointment:", err);
+      alert("Booking failed. Try again.");
+    }
+  };
 
   // Logout
   const handleLogout = async () => {
@@ -39,16 +64,14 @@ export default function HomeClient() {
   return (
     <div style={{ padding: "20px" }}>
       <h1>Welcome, {user?.email || "Client"} 🎉</h1>
-      <p>Here are available massage therapists:</p>
+      <p>Available therapists:</p>
 
       {therapists.length > 0 ? (
         <ul>
-          {therapists.map(t => (
+          {therapists.map((t) => (
             <li key={t.id}>
               <strong>{t.name}</strong> — {t.specialty}{" "}
-              <button onClick={() => alert(`Booking with ${t.name}`)}>
-                Book Appointment
-              </button>
+              <button onClick={() => handleBooking(t)}>Book Appointment</button>
             </li>
           ))}
         </ul>
