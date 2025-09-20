@@ -8,7 +8,7 @@ import { auth, db } from "../services/firebase.config";
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("client"); // ✅ default to client
+  const [role, setRole] = useState("client"); // default role
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -23,11 +23,20 @@ const Signup = () => {
       );
       const user = userCredential.user;
 
-      // Save role in Firestore using user.uid ✅
+      // Save user in "users" collection
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         role: role,
       });
+
+      // If role is therapist, also add them to "therapists" collection
+      if (role === "therapist") {
+        await setDoc(doc(db, "therapists", user.uid), {
+          name: user.email, // later replace with real name field
+          specialty: "Not set yet", // can be updated later
+        });
+        console.log("Therapist added to therapists collection ✅");
+      }
 
       console.log("User signed up ✅", role);
 
