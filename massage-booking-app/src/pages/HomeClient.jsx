@@ -4,11 +4,12 @@ import { auth, db } from "../services/firebase.config";
 import { signOut } from "firebase/auth";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ use context
 
 export default function HomeClient() {
   const [therapists, setTherapists] = useState([]);
   const navigate = useNavigate();
-  const user = auth.currentUser;
+  const { user } = useAuth(); // ✅ user comes from global context
 
   // Fetch therapists from Firestore
   useEffect(() => {
@@ -71,7 +72,9 @@ export default function HomeClient() {
           {therapists.map((t) => (
             <li key={t.id}>
               <strong>{t.name}</strong> — {t.specialty}{" "}
-              <button onClick={() => handleBooking(t)}>Book Appointment</button>
+              <button onClick={() => navigate(`/book/${t.id}`)}>
+                Book Appointment
+              </button>
             </li>
           ))}
         </ul>
