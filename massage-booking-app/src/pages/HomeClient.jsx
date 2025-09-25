@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../services/firebase.config";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +41,28 @@ export default function HomeClient() {
     return () => unsubscribe();
   }, [user]);
 
+  // Cancel booking
+  const cancelBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?"))
+      return;
+
+    await updateDoc(doc(db, "bookings", bookingId), {
+      status: "cancelled",
+    });
+  };
+
+  // Reschedule booking
+  const rescheduleBooking = async (bookingId) => {
+    const newDate = prompt("Enter new date (YYYY-MM-DD):");
+    const newTime = prompt("Enter new time (HH:mm):");
+    if (!newDate || !newTime) return;
+
+    await updateDoc(doc(db, "bookings", bookingId), {
+      date: `${newDate} ${newTime}`,
+      status: "rescheduled",
+    });
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h2>Welcome, {user?.email}</h2>
@@ -59,6 +88,15 @@ export default function HomeClient() {
             <li key={b.id}>
               <strong>{b.date}</strong> with {b.therapistName || b.therapistId}—{" "}
               <em>{b.status}</em>
+              <br />
+              {b.status === "pending" && (
+                <>
+                  <button onClick={() => cancelBooking(b.id)}>Cancel</button>
+                  <button onClick={() => rescheduleBooking(b.id)}>
+                    Reschedule
+                  </button>
+                </>
+              )}
             </li>
           ))}
         </ul>
