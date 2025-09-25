@@ -1,89 +1,68 @@
-// src/pages/HomeClient.jsx
 import { useEffect, useState } from "react";
-import { auth, db } from "../services/firebase.config";
-import { signOut } from "firebase/auth";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { useAuth } from "../context/AuthContext";
+import { db } from "../services/firebase.config";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ use context
 
 export default function HomeClient() {
+  const { user } = useAuth();
   const [therapists, setTherapists] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
-  const { user } = useAuth(); // ✅ user comes from global context
 
-  // Fetch therapists from Firestore
+  // Load therapists
   useEffect(() => {
-    const fetchTherapists = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "therapists"));
-        const data = snapshot.docs.map((docSnap) => ({
-          id: docSnap.id, // therapist UID if stored properly
-          ...docSnap.data(),
-        }));
-        setTherapists(data);
-      } catch (err) {
-        console.error("Error fetching therapists:", err);
-      }
-    };
-    fetchTherapists();
+    const q = query(collection(db, "therapists"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setTherapists(
+        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      );
+    });
+    return () => unsubscribe();
   }, []);
 
-  // Handle booking
-  const handleBooking = async (therapist) => {
-    try {
-      if (!user) {
-        alert("You must be logged in to book an appointment");
-        return;
-      }
-
-      await addDoc(collection(db, "bookings"), {
-        clientId: user.uid,
-        clientEmail: user.email,
-        therapistId: therapist.id, // ✅ now therapist.uid from therapists collection
-        therapistName: therapist.name,
-        date: new Date().toISOString(),
-        status: "pending",
-      });
-
-      alert(`Booking request sent to ${therapist.name} ✅`);
-    } catch (err) {
-      console.error("Error booking appointment:", err);
-      alert("Booking failed. Try again.");
-    }
-  };
-
-  // Logout
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/login");
-    } catch (err) {
-      console.error("Logout failed:", err.message);
-    }
-  };
+  // Load client bookings
+  useEffect(() => {
+    if (!user) return;
+    const q = query(
+      collection(db, "bookings"),
+      where("clientId", "==", user.uid)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setBookings(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, [user]);
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Welcome, {user?.email || "Client"} 🎉</h1>
-      <p>Available therapists:</p>
+      <h2>Welcome, {user?.email}</h2>
 
-      {therapists.length > 0 ? (
+      <h3>Available Therapists</h3>
+      {therapists.map((t) => (
+        <div key={t.id} style={{ marginBottom: "10px" }}>
+          <p>
+            {t.name} - {t.specialty}
+          </p>
+          <button onClick={() => navigate(`/book/${t.id}`)}>
+            Book Appointment
+          </button>
+        </div>
+      ))}
+
+      <h3>My Bookings</h3>
+      {bookings.length === 0 ? (
+        <p>No bookings yet.</p>
+      ) : (
         <ul>
-          {therapists.map((t) => (
-            <li key={t.id}>
-              <strong>{t.name}</strong> — {t.specialty}{" "}
-              <button onClick={() => navigate(`/book/${t.id}`)}>
-                Book Appointment
-              </button>
+          {bookings.map((b) => (
+            <li key={b.id}>
+              <strong>{b.date}</strong> with {b.therapistName || b.therapistId}—{" "}
+              <em>{b.status}</em>
             </li>
           ))}
         </ul>
-      ) : (
-        <p>No therapists available yet.</p>
       )}
-
-      <br />
-      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }
