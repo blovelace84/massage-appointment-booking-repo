@@ -8,8 +8,9 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
-import { db } from "../services/firebase.config";
+import { auth, db } from "../services/firebase.config";
 import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
 
 export default function HomeClient() {
   const { user } = useAuth();
@@ -41,6 +42,12 @@ export default function HomeClient() {
     return () => unsubscribe();
   }, [user]);
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
   // Cancel booking
   const cancelBooking = async (bookingId) => {
     if (!window.confirm("Are you sure you want to cancel this booking?"))
@@ -66,7 +73,7 @@ export default function HomeClient() {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Welcome, {user?.email}</h2>
-
+      <button onClick={() => signOut(auth)}>Logout</button>
       <h3>Available Therapists</h3>
       {therapists.map((t) => (
         <div key={t.id} style={{ marginBottom: "10px" }}>
