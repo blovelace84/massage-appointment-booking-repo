@@ -9,8 +9,8 @@ import {
 } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import { auth, db } from "../services/firebase.config";
-import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function HomeClient() {
   const { user } = useAuth();
@@ -18,7 +18,12 @@ export default function HomeClient() {
   const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
 
-  // Load therapists
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user) navigate("/login");
+  }, [user, navigate]);
+
+  // Load therapists list
   useEffect(() => {
     const q = query(collection(db, "therapists"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -42,28 +47,18 @@ export default function HomeClient() {
     return () => unsubscribe();
   }, [user]);
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
-
-  // Cancel booking
+  // Cancel a booking
   const cancelBooking = async (bookingId) => {
     if (!window.confirm("Are you sure you want to cancel this booking?"))
       return;
-
-    await updateDoc(doc(db, "bookings", bookingId), {
-      status: "cancelled",
-    });
+    await updateDoc(doc(db, "bookings", bookingId), { status: "cancelled" });
   };
 
-  // Reschedule booking
+  // Reschedule a booking
   const rescheduleBooking = async (bookingId) => {
     const newDate = prompt("Enter new date (YYYY-MM-DD):");
     const newTime = prompt("Enter new time (HH:mm):");
     if (!newDate || !newTime) return;
-
     await updateDoc(doc(db, "bookings", bookingId), {
       date: `${newDate} ${newTime}`,
       status: "rescheduled",
@@ -74,20 +69,22 @@ export default function HomeClient() {
     <div style={{ padding: "20px" }}>
       <h2>Welcome, {user?.email}</h2>
       <button onClick={() => signOut(auth)}>Logout</button>
-      <button onClick={() => navigate(`therapist/${t.id}`)}>
-        View Profile
-      </button>
+
       <h3>Available Therapists</h3>
-      {therapists.map((t) => (
-        <div key={t.id} style={{ marginBottom: "10px" }}>
-          <p>
-            {t.name} - {t.specialty}
-          </p>
-          <button onClick={() => navigate(`/book/${t.id}`)}>
-            Book Appointment
-          </button>
-        </div>
-      ))}
+      {therapists.length === 0 ? (
+        <p>No therapists found.</p>
+      ) : (
+        therapists.map((t) => (
+          <div key={t.id} style={{ marginBottom: "10px" }}>
+            <p>
+              <strong>{t.name}</strong> — {t.specialty}
+            </p>
+            <button onClick={() => navigate(`/therapist/${t.id}`)}>
+              View Profile
+            </button>
+          </div>
+        ))
+      )}
 
       <h3>My Bookings</h3>
       {bookings.length === 0 ? (
@@ -95,9 +92,9 @@ export default function HomeClient() {
       ) : (
         <ul>
           {bookings.map((b) => (
-            <li key={b.id}>
-              <strong>{b.date}</strong> with {b.therapistName || b.therapistId}—{" "}
-              <em>{b.status}</em>
+            <li key={b.id} style={{ marginBottom: "10px" }}>
+              <strong>{b.date}</strong> with {b.therapistName || b.therapistId}{" "}
+              — <em>{b.status}</em>
               <br />
               {b.status === "pending" && (
                 <>
