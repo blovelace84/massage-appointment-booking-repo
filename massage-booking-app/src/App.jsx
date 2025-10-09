@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import HomeClient from "./pages/HomeClient";
 import TherapistProfile from "./pages/TherapistProfile";
+import BookingConfirmation from "./pages/BookingConfirmation";
 import HomeTherapist from "./pages/HomeTherapist";
 import { auth } from "./services/firebase.config";
 import BookingForm from "./pages/BookingForm";
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/" element={<Navigate to="/login" />} />
         {/* fallback route */}
         <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="/booking-confirmation" element={<BookingConfirmation />} />
       </Routes>
     </div>
   );

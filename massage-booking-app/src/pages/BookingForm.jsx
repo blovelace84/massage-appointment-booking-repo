@@ -28,7 +28,7 @@ export default function BookingForm() {
         status: "pending",
       });
 
-      alert("Booking request submitted ✅");
+      navigate("/booking-confirmed");
       navigate("/client");
     } catch (err) {
       console.error("Error booking appointment:", err);
