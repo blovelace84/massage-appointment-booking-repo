@@ -74,6 +74,9 @@ export default function HomeClient() {
     <div style={{ padding: "20px" }}>
       <h2>Welcome, {user?.email}</h2>
       <button onClick={() => signOut(auth)}>Logout</button>
+      <button onClick={() => navigate(`therapist/${t.id}`)}>
+        View Profile
+      </button>
       <h3>Available Therapists</h3>
       {therapists.map((t) => (
         <div key={t.id} style={{ marginBottom: "10px" }}>

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import HomeClient from "./pages/HomeClient";
+import TherapistProfile from "./pages/TherapistProfile";
 import HomeTherapist from "./pages/HomeTherapist";
 import { auth } from "./services/firebase.config";
 import BookingForm from "./pages/BookingForm";
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/client" element={<HomeClient />} />
+        <Route path="/therapist/:therapistId" element={<TherapistProfile />} />
         <Route path="/home-therapist" element={<HomeTherapist />} />
         <Route path="/book/:therapistId" element={<BookingForm />} />
         {/* redirect root to login */}
