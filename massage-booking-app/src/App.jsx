@@ -1,40 +1,57 @@
-import { Routes, Route, Link, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./services/firebase.config";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import HomeClient from "./pages/HomeClient";
-import TherapistProfile from "./pages/TherapistProfile";
-import BookingConfirmation from "./pages/BookingConfirmation";
 import HomeTherapist from "./pages/HomeTherapist";
-import { auth } from "./services/firebase.config";
 import BookingForm from "./pages/BookingForm";
+import BookingConfirmation from "./pages/BookingConfirmation";
 
-const App = () => {
+function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    console.log("Firebase Auth Ready!", auth);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
-  return (
-    <div>
-      <nav>
-        <Link to="/signup">Signup</Link> | <Link to="/login">Login</Link>
-      </nav>
+  if (loading) return <p>Loading...</p>;
 
+  return (
+    <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/client" element={<HomeClient />} />
-        <Route path="/therapist/:therapistId" element={<TherapistProfile />} />
-        <Route path="/home-therapist" element={<HomeTherapist />} />
-        <Route path="/book/:therapistId" element={<BookingForm />} />
-        {/* redirect root to login */}
-        <Route path="/" element={<Navigate to="/login" />} />
-        {/* fallback route */}
-        <Route path="*" element={<Navigate to="/login" />} />
-        <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+
+        {/* Only show protected routes if user is logged in */}
+        {user ? (
+          <>
+            <Route path="/client" element={<HomeClient />} />
+            <Route path="/therapist" element={<HomeTherapist />} />
+            <Route path="/book/:therapistId" element={<BookingForm />} />
+            <Route
+              path="/booking-confirmed"
+              element={<BookingConfirmation />}
+            />
+            <Route path="*" element={<Navigate to="/client" />} />
+          </>
+        ) : (
+          <Route path="*" element={<Navigate to="/login" />} />
+        )}
       </Routes>
-    </div>
+    </Router>
   );
-};
+}
 
 export default App;
