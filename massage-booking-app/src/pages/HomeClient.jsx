@@ -79,7 +79,7 @@ export default function HomeClient() {
             <p>
               <strong>{t.name}</strong> — {t.specialty}
             </p>
-            <button onClick={() => navigate(`/therapist/${t.id}`)}>
+            <button onClick={() => navigate(`/book/${t.id}`)}>
               View Profile
             </button>
           </div>
