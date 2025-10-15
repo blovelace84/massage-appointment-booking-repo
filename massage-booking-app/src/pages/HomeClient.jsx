@@ -67,7 +67,7 @@ export default function HomeClient() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Welcome, {user?.email}</h2>
+      <h2 className="font-sans">Welcome, {user?.email}</h2>
       <button onClick={() => signOut(auth)}>Logout</button>
 
       <h3>Available Therapists</h3>
