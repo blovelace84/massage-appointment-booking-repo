@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase.config";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import HomeClient from "./pages/HomeClient";
@@ -29,28 +25,22 @@ function App() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-        {/* Only show protected routes if user is logged in */}
-        {user ? (
-          <>
-            <Route path="/client" element={<HomeClient />} />
-            <Route path="/therapist" element={<HomeTherapist />} />
-            <Route path="/book/:therapistId" element={<BookingForm />} />
-            <Route
-              path="/booking-confirmed"
-              element={<BookingConfirmation />}
-            />
-            <Route path="*" element={<Navigate to="/client" />} />
-          </>
-        ) : (
-          <Route path="*" element={<Navigate to="/login" />} />
-        )}
-      </Routes>
-    </Router>
+      {user ? (
+        <>
+          <Route path="/client" element={<HomeClient />} />
+          <Route path="/therapist" element={<HomeTherapist />} />
+          <Route path="/book/:therapistId" element={<BookingForm />} />
+          <Route path="/booking-confirmed" element={<BookingConfirmation />} />
+          <Route path="*" element={<Navigate to="/client" />} />
+        </>
+      ) : (
+        <Route path="*" element={<Navigate to="/login" />} />
+      )}
+    </Routes>
   );
 }
 
