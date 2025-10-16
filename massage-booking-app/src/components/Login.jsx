@@ -2,47 +2,71 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/firebase.config";
 import { useNavigate } from "react-router-dom";
+import { Box, Input, Button, Heading } from "@chakra-ui/react";
+import ErrorAlert from "./ErrorAlert";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassWord] = useState("");
+  const [error, setError] = useState("");
   const nav = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
     try {
       await signInWithEmailAndPassword(auth, email, password);
       nav("/client");
     } catch (err) {
-      alert(err.message); //create a better error message componet later
+      setError(err.message);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
+    <Box
+      maxW="sm"
+      mx="auto"
+      mt="100px"
+      p="6"
+      borderBlockWidth="1px"
+      borderRadius="lg"
+      boxShadow="md"
+    >
+      <Heading mb="4" textAlign="center">
+        Login
+      </Heading>
+      {error && <ErrorAlert message={error} />}
+
       <form onSubmit={handleLogin}>
-        <input
+        <Input
           type="text"
           typeof="email"
           placeholder="Email"
+          mb="3"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <br />
-        <input
+        <Input
           type="text"
           placeholder="Password"
+          mb="3"
           value={password}
           onChange={(e) => setPassWord(e.target.value)}
         />
         <br />
-        <button type="submit">Login</button>
+        <button colorScheme="teal" width="full" type="submit">
+          Login
+        </button>
       </form>
-      <p>
-        Don't have an account?
-        <button onClick={() => nav("/signup")}>Sign up</button>
-      </p>
-    </div>
+      <Button
+        mt="3"
+        variant="link"
+        colorScheme="teal"
+        onClick={() => Navigate("/signup")}
+      >
+        Don't have an account? Sign Up
+      </Button>
+    </Box>
   );
 }
