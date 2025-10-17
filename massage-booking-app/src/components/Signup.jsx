@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../services/firebase.config";
 import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../services/firebase.config";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -24,6 +24,7 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -40,7 +41,7 @@ export default function Signup() {
         navigate("/client");
       }
     } catch (error) {
-      alert(error.message);
+      setError(error.message);
     }
   };
 
@@ -50,41 +51,39 @@ export default function Signup() {
       mx="auto"
       mt="100px"
       p="6"
-      borderBlockWidth="1px"
+      borderWidth="1px"
       borderRadius="lg"
       boxShadow="md"
     >
       <Heading mb="4" textAlign="center">
         Sign Up
       </Heading>
+
       {error && <ErrorAlert message={error} />}
 
       <form onSubmit={handleSignup}>
         <VStack spacing={3}>
           <Input
-            type="email"
             placeholder="Email"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <br />
           <Input
-            type="password"
             placeholder="Password"
+            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <br />
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <Select value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="client">Client</option>
             <option value="therapist">Therapist</option>
-          </select>
-          <br />
-          <button colorScheme="teal" width="full" type="submit">
+          </Select>
+          <Button colorScheme="teal" width="full" type="submit">
             Sign Up
-          </button>
+          </Button>
         </VStack>
       </form>
 
