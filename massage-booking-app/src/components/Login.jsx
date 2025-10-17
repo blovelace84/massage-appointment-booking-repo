@@ -63,7 +63,7 @@ export default function Login() {
         mt="3"
         variant="link"
         colorScheme="teal"
-        onClick={() => Navigate("/signup")}
+        onClick={() => nav("/signup")}
       >
         Don't have an account? Sign Up
       </Button>
