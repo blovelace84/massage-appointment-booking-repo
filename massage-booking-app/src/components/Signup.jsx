@@ -11,8 +11,10 @@ import {
   Select,
   VStack,
   Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import ErrorAlert from "./ErrorAlert";
+import { getFriendlyErrorMessage } from "../utils/firebaseErrorMessages";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -41,62 +43,70 @@ export default function Signup() {
         navigate("/client");
       }
     } catch (error) {
-      setError(error.message);
+      const friendlyMessage = getFriendlyErrorMessage(error.code);
+      setError(friendlyMessage);
     }
   };
 
   return (
     <Box
-      maxW="sm"
-      mx="auto"
-      mt="100px"
-      p="6"
-      borderWidth="1px"
-      borderRadius="lg"
-      boxShadow="md"
+      minH="100vh"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      bg={useColorModeValue("gray.50", "gray.900")}
     >
-      <Heading mb="4" textAlign="center">
-        Sign Up
-      </Heading>
+      <Box
+        w={{ base: "90%", sm: "400px" }}
+        p="8"
+        borderWidth="1px"
+        borderRadius="lg"
+        boxShadow="lg"
+        bg={useColorModeValue("white", "gray.800")}
+      >
+        <Heading mb="6" textAlign="center">
+          Sign Up
+        </Heading>
 
-      {error && <ErrorAlert message={error} />}
+        {error && <ErrorAlert message={error} />}
 
-      <form onSubmit={handleSignup}>
-        <VStack spacing={3}>
-          <Input
-            placeholder="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="client">Client</option>
-            <option value="therapist">Therapist</option>
-          </Select>
-          <Button colorScheme="teal" width="full" type="submit">
-            Sign Up
+        <form onSubmit={handleSignup}>
+          <VStack spacing={4}>
+            <Input
+              placeholder="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <Select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="client">Client</option>
+              <option value="therapist">Therapist</option>
+            </Select>
+            <Button colorScheme="teal" width="full" type="submit">
+              Sign Up
+            </Button>
+          </VStack>
+        </form>
+
+        <Text mt="5" textAlign="center">
+          Already have an account?{" "}
+          <Button
+            variant="link"
+            colorScheme="teal"
+            onClick={() => navigate("/login")}
+          >
+            Login
           </Button>
-        </VStack>
-      </form>
-
-      <Text mt="3" textAlign="center">
-        Already have an account?{" "}
-        <Button
-          variant="link"
-          colorScheme="teal"
-          onClick={() => navigate("/login")}
-        >
-          Login
-        </Button>
-      </Text>
+        </Text>
+      </Box>
     </Box>
   );
 }
